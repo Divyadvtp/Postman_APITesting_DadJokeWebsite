@@ -1,0 +1,897 @@
+{
+	"info": {
+		"_postman_id": "a880ca65-f795-43c8-a114-44e1bbf05d79",
+		"name": "Joke Api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19489371"
+	},
+	"item": [
+		{
+			"name": "Status and Response Time Validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Status validation while getting response\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 300ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all the jokes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1 Starts\r",
+							"//Status validation while getting response\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"//Test 1 Ends\r",
+							"\r",
+							"//Test 2 Starts\r",
+							"//Response time of getting object in response body\r",
+							"pm.test(\"Response time is less than 300ms\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"//Test 2 Ends\r",
+							"\r",
+							"\r",
+							"//saving json response body in the variable\r",
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"//Test 3 Starts\r",
+							"pm.test(\"Response body should be an object\", () => {\r",
+							"    pm.expect(jsonData).to.be.an('object');\r",
+							"});\r",
+							"//Test 3 Ends\r",
+							"\r",
+							"//Test 4 Starts\r",
+							"var count = Object.keys(jsonData).length;\r",
+							"//count Jokes in the Response body\r",
+							"pm.test(\"The number of expected jokes in the response body\", () => {\r",
+							"for(var i = 1; i <= count; i++) {\r",
+							"    pm.expect(count);\r",
+							"    }\r",
+							"    console.log(\"The number of expected Jokes in the response body is: \" + count);\r",
+							"});\r",
+							"//Test 4 Ends\r",
+							"\r",
+							"//Test 5 Starts\r",
+							"//This test will fetch all expected joke exist in the response body along with default one, also you can see that which is default joke in console to make sure.\r",
+							"pm.test(\"Fetch all the Jokes\", () => {\r",
+							"    for(var i = 0; i < count; i++){\r",
+							"        //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        //Test 6 Starts\r",
+							"        pm.test (\"Fetch content value inside the uuid.\", () => {\r",
+							"            var data = pm.response.json();\r",
+							"            pm.expect(data[responseUUID].content);\r",
+							"            console.log(data[responseUUID].content + \" : This is the content value(Joke) inside this '\" + responseUUID + \"' UUID\");\r",
+							"\r",
+							"        });\r",
+							"    //Test 6 Ends\r",
+							"    }\r",
+							"});\r",
+							"//Test 5 Ends\r",
+							"\r",
+							"//Test 7 Starts\r",
+							"//The below test validate Schema for the response body\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"isDeleted\": {\r",
+							"            \"type\": \"boolean\"\r",
+							"        },\r",
+							"        \"content\": {\r",
+							"            \"type\": \"string\"\r",
+							"        } \r",
+							"\r",
+							"    }\r",
+							"}\r",
+							"pm.test(\"Validating schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"//Test 7 Ends\r",
+							"\r",
+							"//Test 8 Starts\r",
+							"//This test will fail when you post empty request body and get uuid without content property which has value datatype string. Console shows that null posted value inside the content is undefine.\r",
+							"//This test will pass only then when you post request body with content value(joke)\r",
+							"pm.test(\"Test data type of the response body\", () => { \r",
+							"    const response = pm.response.json();\r",
+							"     for(var i = 0; i < count; i++){\r",
+							"    //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        pm.expect(response[responseUUID].content).to.be.a(\"string\"); \r",
+							"        pm.expect(response[responseUUID].isDeleted).to.be.a(\"boolean\");\r",
+							"     } \r",
+							"});\r",
+							"//Test 8 Ends\r",
+							"\r",
+							"\r",
+							"//var response = JSON.parse(responseBody);\r",
+							"//var uuid = ((responseBody.toString().split(':'))[0]).replace('{','');\r",
+							"//uuid = uuid.replace(/\\\"/g,'');\r",
+							"\r",
+							"//set variable for uuid and joke value in environment a\r",
+							"//pm.environment.set('uuid', uuid);\r",
+							"//pm.environment.set('joke', JSON.stringify(response[uuid].content));\r",
+							"\r",
+							"    //pm.environment.get('uuid');\r",
+							"    //pm.environment.get('joke');\r",
+							"    //console.log(uuid);\r",
+							"    //console.log(jsonData[uuid].content);\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"//pm.test(\"Test data type and value of the response\", () => { \r",
+							"  //  const response = pm.response.json();\r",
+							"    //pm.expect(response[uuid].content).to.be.a(\"string\"); \r",
+							"    //pm.expect(response[uuid].isDeleted).to.be.a(\"boolean\");\r",
+							"//});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post a new joke",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1 Starts\r",
+							"//Status validation after Posting request\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"//Test 1 Ends\r",
+							"\r",
+							"//Test 2 Starts\r",
+							"//Response time after posting object.\r",
+							"pm.test(\"Response time is less than 300ms\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"//Test 2 Ends\r",
+							"\r",
+							"//Test 3 Starts\r",
+							"//success message should display in response body after posting new joke request\r",
+							"pm.test(\"New joke has been added successfully\", () => {\r",
+							"    pm.response.to.have.body('\"success\"');\r",
+							"});\r",
+							"//Test 3 End\r",
+							"\r",
+							"\r",
+							"//Test 4 Starts\r",
+							"//this test confirms that request body and content should not be null but api still post null value and show success message even if this test fails with null request body.\r",
+							"pm.test(\"Verify the request body is not null\", () => {\r",
+							"        const reqBody = JSON.parse(pm.request.body.raw);\r",
+							"        pm.expect(reqBody).to.not.null;\r",
+							"        pm.expect(reqBody.content).to.not.null;\r",
+							"        //console.log(reqBody);\r",
+							"});\r",
+							"//Test 4 Ends\r",
+							"\r",
+							"//Test 5 Starts\r",
+							"//validating schema for request body\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"content\": {\r",
+							"            \"type\": \"string\"\r",
+							"        } \r",
+							"\r",
+							"    }\r",
+							"}\r",
+							"pm.test(\"Validating schema\", () => {\r",
+							"    pm.request.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"//Test 5 Ends\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"content\": \"Docker seems great fun!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get new joke in the joke list",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1 Starts\r",
+							"//Status validation while getting response\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"//Test 1 Ends\r",
+							"\r",
+							"//Test 2 Starts\r",
+							"//Response time of getting object in response body\r",
+							"pm.test(\"Response time is less than 300ms\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"//Test 2 Ends\r",
+							"\r",
+							"\r",
+							"//saving json response body in the variable\r",
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"//Test 3 Starts\r",
+							"pm.test(\"Response body should be an object\", () => {\r",
+							"    pm.expect(jsonData).to.be.an('object');\r",
+							"});\r",
+							"//Test 3 Ends\r",
+							"\r",
+							"//Test 4 Starts\r",
+							"var count = Object.keys(jsonData).length;\r",
+							"//count Jokes in the Response body\r",
+							"pm.test(\"The number of expected jokes in the response body\", () => {\r",
+							"for(var i = 0; i < count; i++) {\r",
+							"    pm.expect(count);\r",
+							"    \r",
+							"    }\r",
+							"    console.log(\"The number of expected Jokes in the response body is: \" + count);\r",
+							"});\r",
+							"//Test 4 Ends\r",
+							"\r",
+							"//Test 5 Starts\r",
+							"//This test will fetch all expected joke exist in the response body along with default one, also you can see that which is default joke in console to make sure.\r",
+							"pm.test(\"Fetch all the posted Jokes\", () => {\r",
+							"    for(var i = 0; i < count; i++){\r",
+							"        //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        //Test 6 Starts\r",
+							"        pm.test (\"Fetch content value inside the uuid.\", () => {\r",
+							"            var data = pm.response.json();\r",
+							"            pm.expect(data[responseUUID].content);\r",
+							"            console.log(data[responseUUID].content + \" : This is the content value(Joke) inside this '\" + responseUUID + \"' UUID\");\r",
+							"\r",
+							"        });\r",
+							"    //Test 6 Ends\r",
+							"    }\r",
+							"});\r",
+							"//Test 5 Ends\r",
+							"\r",
+							"//Test 7 Starts\r",
+							"//The below test validate Schema for the response body\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"isDeleted\": {\r",
+							"            \"type\": \"boolean\"\r",
+							"        },\r",
+							"        \"content\": {\r",
+							"            \"type\": \"string\"\r",
+							"        } \r",
+							"\r",
+							"    }\r",
+							"}\r",
+							"pm.test(\"Validating schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"//Test 7 Ends\r",
+							"\r",
+							"//Test 8 Starts\r",
+							"//This test will fail when you post empty request body and get uuid without content property which has value datatype string. Console shows that null posted value inside the content is undefine.\r",
+							"//This test will pass only then when you post request body with content value(joke)\r",
+							"pm.test(\"Test data type of the response body\", () => { \r",
+							"    const response = pm.response.json();\r",
+							"     for(var i = 0; i < count; i++){\r",
+							"    //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        pm.expect(response[responseUUID].content).to.be.a(\"string\"); \r",
+							"        pm.expect(response[responseUUID].isDeleted).to.be.a(\"boolean\");\r",
+							"     } \r",
+							"});\r",
+							"//Test 8 Ends\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update existed Joke",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1 Starts\r",
+							"//Status validation after Putting request to update data\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"//Test 1 Ends\r",
+							"\r",
+							"//Test 2 Starts\r",
+							"//Response time after putting request to update data.\r",
+							"pm.test(\"Response time is less than 300ms\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"//Test 2 Ends\r",
+							"\r",
+							"//Test 3 Starts\r",
+							"//success message should display in response body after Updating existed joke\r",
+							"pm.test(\"Joke should be updated successfully\", () => {\r",
+							"    pm.response.to.have.body('\"success\"');\r",
+							"});\r",
+							"//Test 3 Ends\r",
+							"\r",
+							"//Test 4 Starts\r",
+							"//This test confirms that request body, uuid and content should not be null but api still update content to null value when you just put uuid and null content. Response body shows success message even if this test fails with null request body.\r",
+							"pm.test(\"Verify the request body is not null\", () => {\r",
+							"        const reqBody = JSON.parse(pm.request.body.raw);\r",
+							"        pm.expect(reqBody).to.not.null;\r",
+							"        pm.expect(reqBody.uuid).to.not.null;\r",
+							"        pm.expect(reqBody.content).to.not.null;\r",
+							"        console.log(reqBody);\r",
+							"});\r",
+							"//Test 4 Ends\r",
+							"\r",
+							"//Test 5 Starts\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"uuid\": {\r",
+							"            \"type\": \"string\"\r",
+							"        },\r",
+							"        \"content\": {\r",
+							"            \"type\": \"string\"\r",
+							"        } \r",
+							"\r",
+							"    }\r",
+							"}\r",
+							"pm.test(\"Validating schema\", () => {\r",
+							"    pm.request.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"//Test 5 Ends\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uuid\": \"55ad4259-999-0038-4989-a8ff-101c88ccdcf5\",\r\n    \"content\": \"I invented a new word. JokeBank!\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get updated joke",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1 Starts\r",
+							"//Status validation while getting response\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"//Test 1 Ends\r",
+							"\r",
+							"//Test 2 Starts\r",
+							"//Response time of getting object in response body\r",
+							"pm.test(\"Response time is less than 300ms\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"//Test 2 Ends\r",
+							"\r",
+							"\r",
+							"//saving json response body in the variable\r",
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"//Test 3 Starts\r",
+							"pm.test(\"Response body should be an object\", () => {\r",
+							"    pm.expect(jsonData).to.be.an('object');\r",
+							"});\r",
+							"//Test 3 Ends\r",
+							"\r",
+							"//Test 4 Starts\r",
+							"var count = Object.keys(jsonData).length;\r",
+							"//count Jokes in the Response body\r",
+							"pm.test(\"The number of expected jokes in the response body\", () => {\r",
+							"for(var i = 0; i < count; i++) {\r",
+							"    pm.expect(count);\r",
+							"    \r",
+							"    }\r",
+							"    console.log(\"The number of expected Jokes in the response body is: \" + count);\r",
+							"});\r",
+							"//Test 4 Ends\r",
+							"\r",
+							"//Test 5 Starts\r",
+							"//This test will fetch all expected joke exist in the response body along with default one, also you can see that which is default joke in console to make sure.\r",
+							"pm.test(\"Fetch all the updated Jokes\", () => {\r",
+							"    for(var i = 0; i < count; i++){\r",
+							"        //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        //Test 6 Starts\r",
+							"        pm.test (\"Fetch content value inside the uuid.\", () => {\r",
+							"            var data = pm.response.json();\r",
+							"            pm.expect(data[responseUUID].content);\r",
+							"            console.log(data[responseUUID].content + \" : This is the content value(Joke) inside this '\" + responseUUID + \"' UUID\");\r",
+							"\r",
+							"        });\r",
+							"    //Test 6 Ends\r",
+							"    }\r",
+							"});\r",
+							"//Test 5 Ends\r",
+							"\r",
+							"//Test 7 Starts\r",
+							"//The below test validate Schema for the response body\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"isDeleted\": {\r",
+							"            \"type\": \"boolean\"\r",
+							"        },\r",
+							"        \"content\": {\r",
+							"            \"type\": \"string\"\r",
+							"        } \r",
+							"\r",
+							"    }\r",
+							"}\r",
+							"pm.test(\"Validating schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"//Test 7 Ends\r",
+							"\r",
+							"//Test 8 Starts\r",
+							"//This test will fail when you post empty request body and get uuid without content property which has value datatype string. Console shows that null posted value inside the content is undefine.\r",
+							"//This test will pass only then when you post request body with content value(joke)\r",
+							"pm.test(\"Test data type of the response body\", () => { \r",
+							"    const response = pm.response.json();\r",
+							"     for(var i = 0; i < count; i++){\r",
+							"    //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        pm.expect(response[responseUUID].content).to.be.a(\"string\"); \r",
+							"        pm.expect(response[responseUUID].isDeleted).to.be.a(\"boolean\");\r",
+							"     } \r",
+							"});\r",
+							"//Test 8 Ends\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete existed joke",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1 Starts\r",
+							"//Status validation after Putting request to update data\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"//Test 1 Ends\r",
+							"\r",
+							"//Test 2 Starts\r",
+							"//Response time after putting request to update data.\r",
+							"pm.test(\"Response time is less than 300ms\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"//Test 2 Ends\r",
+							"\r",
+							"//Test 3 Starts\r",
+							"//success message should display in response body after deleting existed joke\r",
+							"pm.test(\"Joke should be deleted successfully\", () => {\r",
+							"    pm.response.to.have.body('\"success\"');\r",
+							"});\r",
+							"//Test 3 Ends\r",
+							"\r",
+							"//Test 4 Starts\r",
+							"//This test confirms that request body, and uuid should not be null. Response body shows success message even if this test fails with null request body.\r",
+							"pm.test(\"Verify the request body is not null\", () => {\r",
+							"        const reqBody = JSON.parse(pm.request.body.raw);\r",
+							"        pm.expect(reqBody).to.not.null;\r",
+							"        pm.expect(reqBody.uuid).to.not.null;\r",
+							"        console.log(reqBody);\r",
+							"});\r",
+							"//Test 4 Ends\r",
+							"\r",
+							"//Test 5 starts\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"\r",
+							"        \"uuid\": {\r",
+							"            \"type\": \"string\"\r",
+							"        }\r",
+							"    }\r",
+							"}\r",
+							"pm.test(\"Validating schema\", () => {\r",
+							"    pm.request.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"//Test 5 Ends\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uuid\": \"fa6-d8de566c-b8c3-4af6-8929-1fb017c0359b\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Check if isDeleted flage is true",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Test 1 Starts\r",
+							"//Status validation while getting response\r",
+							"pm.test(\"Status code is 200\", () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"//Test 1 Ends\r",
+							"\r",
+							"//Test 2 Starts\r",
+							"//Response time of getting object in response body\r",
+							"pm.test(\"Response time is less than 300ms\", () => {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(300);\r",
+							"});\r",
+							"//Test 2 Ends\r",
+							"\r",
+							"\r",
+							"//saving json response body in the variable\r",
+							"const jsonData = pm.response.json();\r",
+							"\r",
+							"//Test 3 Starts\r",
+							"pm.test(\"Response body should be an object\", () => {\r",
+							"    pm.expect(jsonData).to.be.an('object');\r",
+							"});\r",
+							"//Test 3 Ends\r",
+							"\r",
+							"//Test 4 Starts\r",
+							"var count = Object.keys(jsonData).length;\r",
+							"//count Jokes in the Response body\r",
+							"pm.test(\"The number of expected jokes in the response body\", () => {\r",
+							"for(var i = 0; i < count; i++) {\r",
+							"    pm.expect(count);\r",
+							"    \r",
+							"    }\r",
+							"    console.log(\"The number of expected Jokes in the response body is: \" + count);\r",
+							"});\r",
+							"//Test 4 Ends\r",
+							"\r",
+							"//Test 5 Starts\r",
+							"//This test will fetch all expected joke exist in the response body along with default one, also you can see that which is default joke in console to make sure.\r",
+							"pm.test(\"Fetch all the Jokes with isDeleted true and false\", () => {\r",
+							"    for(var i = 0; i < count; i++){\r",
+							"        //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        //Test 6 Starts\r",
+							"        pm.test (\"Fetch content value inside the uuid.\", () => {\r",
+							"            var data = pm.response.json();\r",
+							"            pm.expect(data[responseUUID].content);\r",
+							"            pm.expect(data[responseUUID].isDeleted);\r",
+							"            console.log(data[responseUUID].content + \" isDeleted: \" + data[responseUUID].isDeleted + \" = This is the content value(Joke) inside this '\" + responseUUID + \"' UUID\");\r",
+							"\r",
+							"        });\r",
+							"    //Test 6 Ends\r",
+							"    }\r",
+							"});\r",
+							"//Test 5 Ends\r",
+							"\r",
+							"\r",
+							"//Test 7 Starts\r",
+							"//The below test validate Schema for the response body\r",
+							"const schema = {\r",
+							"    \"type\": \"object\",\r",
+							"    \"properties\": {\r",
+							"        \"isDeleted\": {\r",
+							"            \"type\": \"boolean\"\r",
+							"        },\r",
+							"        \"content\": {\r",
+							"            \"type\": \"string\"\r",
+							"        } \r",
+							"\r",
+							"    }\r",
+							"}\r",
+							"pm.test(\"Validating schema\", () => {\r",
+							"    pm.response.to.have.jsonSchema(schema);\r",
+							"});\r",
+							"//Test 7 Ends\r",
+							"\r",
+							"//Test 8 Starts\r",
+							"//This test will fail when you post empty request body and get uuid without content property which has value datatype string. Console shows that null posted value inside the content is undefine.\r",
+							"//This test will pass only then when you post request body with content value(joke)\r",
+							"pm.test(\"Test data type of the response body\", () => { \r",
+							"    const response = pm.response.json();\r",
+							"     for(var i = 0; i < count; i++){\r",
+							"    //responseUUID variable saving all the uuid that has been existed or will exist in the responsebody\r",
+							"        var responseUUID = (_.keys(jsonData))[i];\r",
+							"        pm.expect(response[responseUUID].content).to.be.a(\"string\"); \r",
+							"        pm.expect(response[responseUUID].isDeleted).to.be.a(\"boolean\");\r",
+							"     } \r",
+							"});\r",
+							"//Test 8 Ends\r",
+							"\r",
+							"//Test 9 Starts\r",
+							"//This test will confirm that the value hs been deleted by turning isDeleted flag value to true\r",
+							"//this will only execute if we can put param in the url such as http://backend.127-0-0-1.sslip.io/jokes?isDeleted=true something like that otherwise this test won't PASS.\r",
+							"pm.test(\"Check isDeleted flag value is true\", () => {\r",
+							"   // for(var i = 0; i < count; i++){\r",
+							"    //var responseUUID = (_.keys(jsonData))[i];\r",
+							"    //var data = pm.response.json();\r",
+							"      //      pm.expect(data[responseUUID].isDeleted).to.eql(\"True\");\r",
+							"        //    console.log(data[responseUUID].isDeleted + \" : This is the content value(Joke) inside this '\" + responseUUID + \"' UUID\");\r",
+							"  //  }\r",
+							"});\r",
+							"//Test 9 Ends\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://backend.127-0-0-1.sslip.io/jokes",
+					"protocol": "http",
+					"host": [
+						"backend",
+						"127-0-0-1",
+						"sslip",
+						"io"
+					],
+					"path": [
+						"jokes"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://backend.127-0-0-1.sslip.io"
+		}
+	]
+}
